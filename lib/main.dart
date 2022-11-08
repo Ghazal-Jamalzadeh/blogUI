@@ -2,8 +2,17 @@ import 'package:blogui/carousel/carousel_slider.dart';
 import 'package:blogui/data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
+
+  /* تغییر رنگ استاتوس بار و نویگیشن گوشی در اپ فلاتزی */
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.white,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarColor: Colors.white,
+      systemNavigationBarIconBrightness: Brightness.dark));
+
   runApp(const MyApp());
 }
 
@@ -59,11 +68,16 @@ class MyApp extends StatelessWidget {
                 color: primaryTextColor,
                 fontWeight: FontWeight.w400,
                 fontSize: 14),
+            caption: TextStyle(
+                fontFamily: defaultFontFamily,
+                fontWeight: FontWeight.w700,
+                color: Color(0xff7B8BB2),
+                fontSize: 10),
           )),
       home: Stack(
-        children: [
+        children: const [
           /* یعنی کل صفحه را بگیرد  */
-          const Positioned.fill(bottom: 65, child: HomeScreen()),
+          Positioned.fill(bottom: 65, child: HomeScreen()),
           Positioned(bottom: 0, right: 0, left: 0, child: _BottomNavigation())
         ],
       ),
@@ -504,9 +518,29 @@ class _BottomNavigation extends StatelessWidget {
                     boxShadow: [BoxShadow(blurRadius: 20 , color: const Color(0xaa9B8487).withOpacity(0.3))]
                 ),
             child: Row(
-              children: [
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: const [
+                  BottomNavigationItem(
+                      iconFileName: 'Home.png',
+                      activeIconFileName: 'Home.png',
+                      title: 'Home'),
+                  BottomNavigationItem(
+                      iconFileName: 'Articles.png',
+                      activeIconFileName: 'Articles.png',
+                      title: 'Article'),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  BottomNavigationItem(
+                      iconFileName: 'Search.png',
+                      activeIconFileName: 'Search.png',
+                      title: 'Search'),
+                  BottomNavigationItem(
+                      iconFileName: 'Menu.png',
+                      activeIconFileName: 'Menu.png',
+                      title: 'Menu'),
+                ],
 
-              ],
             ),
             ),
           ) ,
@@ -518,7 +552,11 @@ class _BottomNavigation extends StatelessWidget {
               alignment: Alignment.topCenter,
               child: Container(
                 height: 65,
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(32.5) ,  color: Color(0xff376AED),) ,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(32.5) ,
+                    color: Color(0xff376AED),
+                      border: Border.all(color: Colors.white, width: 4),
+              ) ,
                   child: Image.asset('assets/img/icons/plus.png')),
             ),
           )
