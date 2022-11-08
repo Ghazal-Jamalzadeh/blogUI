@@ -1,5 +1,6 @@
 import 'package:blogui/carousel/carousel_slider.dart';
 import 'package:blogui/data.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -17,20 +18,20 @@ class MyApp extends StatelessWidget {
     //colors
     const primaryTextColor = Color(0xff0D253C);
     const Color secondaryTextColor = Color(0xff2D4379);
+    const primaryColor = Color(0xff376AED);
 
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-          // This is the theme of your application.
-          //
-          // Try running your application with "flutter run". You'll see the
-          // application has a blue toolbar. Then, without quitting the app, try
-          // changing the primarySwatch below to Colors.green and then invoke
-          // "hot reload" (press "r" in the console where you ran "flutter run",
-          // or simply save your changes to "hot reload" in a Flutter IDE).
-          // Notice that the counter didn't reset back to zero; the application
-          // is not restarted.
           primarySwatch: Colors.blue,
+          textButtonTheme: TextButtonThemeData(
+              style: ButtonStyle(
+                  /* چون دکمه است MaterialStateProperty میگیره که state های مختلفی را ساپورت میکنه. ولی ما میزنیم all یعنی همه state ها  */
+                  textStyle: MaterialStateProperty.all(const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            fontFamily: defaultFontFamily,
+          )))),
           textTheme: const TextTheme(
             subtitle1: TextStyle(
               fontFamily: defaultFontFamily,
@@ -43,13 +44,29 @@ class MyApp extends StatelessWidget {
               color: primaryTextColor,
               fontSize: 18,
             ),
+            headline5: TextStyle(
+                fontFamily: defaultFontFamily,
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: primaryTextColor),
             bodyText2: TextStyle(
               fontFamily: defaultFontFamily,
               color: secondaryTextColor,
               fontSize: 12,
             ),
+            subtitle2: TextStyle(
+                fontFamily: defaultFontFamily,
+                color: primaryTextColor,
+                fontWeight: FontWeight.w400,
+                fontSize: 14),
           )),
-      home: const HomeScreen(),
+      home: Stack(
+        children: [
+          /* یعنی کل صفحه را بگیرد  */
+          const Positioned.fill(bottom: 65, child: HomeScreen()),
+          Positioned(bottom: 0, right: 0, left: 0, child: _BottomNavigation())
+        ],
+      ),
     );
   }
 }
@@ -66,6 +83,8 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
+          /*حالت آیفون اسکرول میخورد */
+          physics: BouncingScrollPhysics(),
           child: Column(
             /* به صورت پیش فرض در column فرزندان وسط قرار میگیرند برای جلوگیری از این */
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,10 +116,102 @@ class HomeScreen extends StatelessWidget {
                 height: 16,
               ),
               _CategoryList(),
+              _PostList(),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _StoryList extends StatelessWidget {
+  final List<StoryData> stories;
+
+  const _StoryList({
+    Key? key,
+    required this.stories,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData themeData = Theme.of(context);
+
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: 100,
+      child: ListView.builder(
+          padding: const EdgeInsets.fromLTRB(32, 0, 32, 0),
+          /*حالت آیفون اسکرول میخورد */
+          physics: const BouncingScrollPhysics(),
+          itemCount: stories.length,
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (context, index) {
+            final story = stories[index];
+
+            return _StoryItem(story: story, themeData: themeData);
+          }),
+    );
+  }
+}
+
+class _StoryItem extends StatelessWidget {
+  const _StoryItem({
+    Key? key,
+    required this.story,
+    required this.themeData,
+  }) : super(key: key);
+
+  final StoryData story;
+  final ThemeData themeData;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Stack(
+          children: [
+            Container(
+              margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+              width: 68,
+              height: 68,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24),
+                gradient:
+                    const LinearGradient(begin: Alignment.topLeft, colors: [
+                  Color(0xff376AED),
+                  Color(0xff49B0E2),
+                  Color(0xff9CECFB),
+                ]),
+              ),
+              child: Container(
+                margin: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding: const EdgeInsets.all(4),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child:
+                      Image.asset('assets/img/stories/${story.imageFileName}'),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: Image.asset(
+                'assets/img/icons/${story.iconFileName}',
+                width: 24,
+                height: 24,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(story.name, style: themeData.textTheme.bodyText2)
+      ],
     );
   }
 }
@@ -118,8 +229,8 @@ class _CategoryList extends StatelessWidget {
         itemBuilder: (context, index, realIndex) {
           return _CategoryItem(
             category: categories[index],
-            left: realIndex == 0 ? 32 : 8 ,
-            right: realIndex == categories.length -1 ? 32 : 8  ,
+            left: realIndex == 0 ? 32 : 8,
+            right: realIndex == categories.length - 1 ? 32 : 8,
           );
         },
         options: CarouselOptions(
@@ -148,6 +259,7 @@ class _CategoryList extends StatelessWidget {
 
 class _CategoryItem extends StatelessWidget {
   final Category category;
+
   /*برای آیتم اپل و آخر میخواهیم یک margin اضافه در نظر بگیریم */
   final double left;
   final double right;
@@ -155,20 +267,30 @@ class _CategoryItem extends StatelessWidget {
   const _CategoryItem({
     Key? key,
     required this.category,
-    required this.left ,
-    required this.right ,
+    required this.left,
+    required this.right,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.fromLTRB(left , 0 , right , 0  ),
+      margin: EdgeInsets.fromLTRB(left, 0, right, 0),
       child: Stack(
         children: [
           /*چون این container یک گرادیانت به صورت فورگراند داره اگه تکستی توش قرار بگیره هم می افته پشت گرادیانت - پس از استک استفاده میکنیم که آیتم ها را روی هم میچینه */
           Positioned.fill(
+              top: 100,
+              right: 65,
+              left: 65,
+              bottom: 24,
+              child: Container(
+                decoration: const BoxDecoration(boxShadow: [
+                  BoxShadow(blurRadius: 20, color: Color(0xaa0D253C)),
+                ]),
+              )),
+          Positioned.fill(
             child: Container(
-              margin: EdgeInsets.all(8),
+              margin: const EdgeInsets.fromLTRB(0, 0, 0, 16),
               decoration: BoxDecoration(
                 color: Colors.blue,
                 borderRadius: BorderRadius.circular(32),
@@ -192,16 +314,6 @@ class _CategoryItem extends StatelessWidget {
               ),
             ),
           ),
-          Positioned.fill(
-              top: 180,
-              right: 65,
-              left: 65,
-              bottom: 24,
-              child: Container(
-                decoration: const BoxDecoration(boxShadow: [
-                  BoxShadow(blurRadius: 20, color: Color(0xaa0D253C)),
-                ]),
-              )),
           Positioned(
               bottom: 48,
               left: 32,
@@ -216,93 +328,231 @@ class _CategoryItem extends StatelessWidget {
   }
 }
 
-class _StoryList extends StatelessWidget {
-  final List<Story> stories;
-
-  const _StoryList({
-    Key? key,
-    required this.stories,
-  }) : super(key: key);
+class _PostList extends StatelessWidget {
+  const _PostList({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData themeData = Theme.of(context);
+    final posts = AppDatabase.posts;
 
-    return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      height: 100,
-      child: ListView.builder(
-          padding: const EdgeInsets.fromLTRB(32, 0, 32, 0),
-        /*حالت آیفون اسکرول میخورد */
-          physics: const BouncingScrollPhysics(),
-          itemCount: stories.length,
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (context, index) {
-            final story = stories[index];
-
-            return _StoryItem(story: story, themeData: themeData);
-          }),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 32, right: 32),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Latest News',
+                style: Theme.of(context).textTheme.headline5,
+              ),
+              TextButton(
+                onPressed: () {},
+                child: const Text(
+                  'more',
+                  style: TextStyle(color: Color(0xff376AED)),
+                ),
+              ),
+            ],
+          ),
+        ),
+        ListView.builder(
+            itemCount: posts.length,
+            /* باید ارتفاع پست ها مشخص باشد که بدونه چقدر میتونه ادامه بده لیست را */
+            itemExtent: 141,
+            /* برای لیست های طولانی و تو درتو این را true نکنید چون پرفورمنس بد میشه */
+            /* توی فلاتر width height برای تکست ویو باید کاملا مشخص باشه */
+            shrinkWrap: true,
+            physics: ClampingScrollPhysics(),
+            itemBuilder: (context, index) {
+              final post = posts[index];
+              return _Post(post: post);
+            }),
+        SizedBox(
+          height: 32,
+        )
+      ],
     );
   }
 }
 
-class _StoryItem extends StatelessWidget {
-  const _StoryItem({
+class _Post extends StatelessWidget {
+  const _Post({
     Key? key,
-    required this.story,
-    required this.themeData,
+    required this.post,
   }) : super(key: key);
 
-  final Story story;
-  final ThemeData themeData;
+  final PostData post;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 149,
+      margin: const EdgeInsets.fromLTRB(32, 8, 32, 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(
+            blurRadius: 10,
+            color: Color(0x15282FF),
+          )
+        ],
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child:
+                  Image.asset('assets/img/posts/small/${post.imageFileName}')),
+          const SizedBox(
+            width: 16,
+          ),
+          /* اگه تکست را همینجوری بندازیم اونجا و خط بلند شه ارور overflow میگیریم.
+        این مشکل با expanded حل میشه. بهش میگه هر چقدر فضا باقی مونده استفاده کن نه بیشتر نه کمتر. 0pd  */
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    post.caption,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontFamily: MyApp.defaultFontFamily,
+                      fontSize: 14,
+                      color: Color(0xff376AED),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  Text(
+                    post.title,
+                    style: Theme.of(context).textTheme.subtitle2,
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Icon(CupertinoIcons.hand_thumbsup,
+                          size: 16,
+                          color: Theme.of(context).textTheme.bodyText2!.color),
+                      const SizedBox(
+                        width: 4,
+                      ),
+                      Text(post.likes,
+                          style: Theme.of(context).textTheme.bodyText2),
+                      const SizedBox(
+                        width: 16,
+                      ),
+                      Icon(CupertinoIcons.clock,
+                          size: 16,
+                          color: Theme.of(context).textTheme.bodyText2!.color),
+                      const SizedBox(
+                        width: 4,
+                      ),
+                      Text(post.time,
+                          style: Theme.of(context).textTheme.bodyText2),
+                      /* برای اینکه مطمعن شیم ایکون ته قرار میگیره داخل expanded میندازیمش و بعد داخل یک container و به این container میایم alignment میدیم*/
+                      Expanded(
+                        child: Container(
+                          alignment: Alignment.centerRight,
+                          child: Icon(
+                              post.isBookmarked
+                                  ? CupertinoIcons.bookmark_fill
+                                  : CupertinoIcons.bookmark,
+                              size: 16,
+                              color:
+                                  Theme.of(context).textTheme.bodyText2!.color),
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class _BottomNavigation extends StatelessWidget {
+  const _BottomNavigation({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 85,
+      child: Stack(
+        children: [
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+                height: 65,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                    boxShadow: [BoxShadow(blurRadius: 20 , color: const Color(0xaa9B8487).withOpacity(0.3))]
+                ),
+            child: Row(
+              children: [
+
+              ],
+            ),
+            ),
+          ) ,
+          /* دقیقا از بالا و پایین و چپ و راست وسط پرنتش قرار میگیره */
+          Center(
+            child: Container(
+              width: 65,
+              height: 85,
+              alignment: Alignment.topCenter,
+              child: Container(
+                height: 65,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(32.5) ,  color: Color(0xff376AED),) ,
+                  child: Image.asset('assets/img/icons/plus.png')),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class BottomNavigationItem extends StatelessWidget {
+  final String iconFileName;
+  final String activeIconFileName;
+  final String title;
+
+  const BottomNavigationItem(
+      {Key? key,
+      required this.iconFileName,
+      required this.activeIconFileName,
+      required this.title})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Stack(
-          children: [
-            Container(
-              margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-              width: 68,
-              height: 68,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    colors: [
-                      Color(0xff376AED),
-                      Color(0xff49B0E2),
-                      Color(0xff9CECFB),
-                    ]),
-              ),
-              child: Container(
-                margin: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.all(4),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.asset(
-                      'assets/img/stories/${story.imageFileName}'),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: Image.asset(
-                'assets/img/icons/${story.iconFileName}',
-                width: 24,
-                height: 24,
-              ),
-            ),
-          ],
+        Image.asset('assets/img/icons/$iconFileName'),
+        const SizedBox(
+          height: 4,
         ),
-        const SizedBox(height: 8),
-        Text(story.name, style: themeData.textTheme.bodyText2)
+        Text(
+          title,
+          style: Theme.of(context).textTheme.caption,
+        )
       ],
     );
   }
