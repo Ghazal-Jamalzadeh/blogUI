@@ -1,3 +1,4 @@
+import 'package:blogui/auth.dart';
 import 'package:blogui/home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -118,7 +119,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                               Navigator.of(context).pushReplacement(
                                   CupertinoPageRoute(
                                       builder: (context) =>
-                                      const HomeScreen()));
+                                      const AuthScreen()));
                             } else {
                               _pageController.animateToPage(
                                   page + 1,
