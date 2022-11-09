@@ -1,3 +1,4 @@
+import 'package:blogui/article.dart';
 import 'package:blogui/carousel/carousel_slider.dart';
 import 'package:blogui/data.dart';
 import 'package:blogui/gen/assets.gen.dart';
@@ -55,6 +56,18 @@ class MyApp extends StatelessWidget {
             fontWeight: FontWeight.w400,
             fontFamily: FontFamily.avenir,
           )))),
+
+          /*تعریف استایل اپ بار */
+          appBarTheme: const AppBarTheme(
+            /*رنگ بک گراند */
+            backgroundColor: Colors.white ,
+            /* رنگ تکست ها و آیتم های رویی */
+            foregroundColor: primaryTextColor ,
+            elevation: 0 ,
+            /* فاصله title ای که در اپ بار قرار میگرد از دو طرف */
+            titleSpacing: 32 ,
+          ),
+
           textTheme: const TextTheme(
             headline6: TextStyle(
               fontFamily: FontFamily.avenir,
@@ -101,7 +114,7 @@ class MyApp extends StatelessWidget {
       //     Positioned(bottom: 0, right: 0, left: 0, child: _BottomNavigation())
       //   ],
       // ),
-      home: const SplashScreen(),
+      home: const ArticleScreen(),
     );
   }
 }

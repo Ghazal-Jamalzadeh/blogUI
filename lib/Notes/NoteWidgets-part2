@@ -173,3 +173,26 @@ controller-----------------------
  که page ای که در حال حاضر توشیم را داخل خودش نگهدداری میکنه در فرمت double
   چون مثلا وقتی بین دو تا صفحه هستیم مقدارش میشه 1.5
 ** animateToPage
+
+floatingActionButton--------------------------------------------------------------------------------
+** child
+** onPressed
+
+داخل scaffold قرار میگیرد و یک ویو به عنوان child میگیرد که می تواند مثلا آیکون آن باشد
+در حالت دیفالت گرد و متریال دیزاینی است
+ولی میتوانیم customize کنیم
+
+SnackBar--------------------------------------------------------------------------------------------
+
+  void showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      behavior: SnackBarBehavior.fixed,
+    ));
+  }
+
+showSnackBar(context, 'Like button is clicked');
+
+نکته جالب اینکه با نمایش  اسنک بار fab هم میاد بالا
+دلیلش اینه که اسکفلد المان های مختلف متریال دیزاین را میشناسه و ساپورت میکنه
+اگر خارج از اسکفلد باشیم این اتفاق نمی افته
