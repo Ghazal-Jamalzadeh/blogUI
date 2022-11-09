@@ -1,4 +1,5 @@
 import 'package:blogui/home.dart';
+import 'package:blogui/onboarding.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -19,8 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(const Duration(seconds: 2)).then((value) {
       Navigator.of(context)
           .pushReplacement(CupertinoPageRoute(builder: (context) =>
-      // const OnBoardingScreen()
-        const HomeScreen()
+      const OnBoardingScreen()
       ));
     });
     super.initState();

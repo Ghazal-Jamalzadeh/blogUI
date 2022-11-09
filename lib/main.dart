@@ -33,8 +33,20 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Flutter Demo',
+
       theme: ThemeData(
           primarySwatch: Colors.blue,
+
+          /* رنگ های پروژه را اینجا تعریف میکنیم و از همه جا دسترسی داریم با کد زیر */
+          /* color: Theme.of(context).colorScheme.surface,*/
+          colorScheme: const ColorScheme.light(
+              primary: primaryColor,
+              onPrimary: Colors.white,
+              onSurface: primaryTextColor,
+              background: Color(0xffFBFCFF),
+              surface: Colors.white,
+              onBackground: primaryTextColor),
+
           textButtonTheme: TextButtonThemeData(
               style: ButtonStyle(
                   /* چون دکمه است MaterialStateProperty میگیره که state های مختلفی را ساپورت میکنه. ولی ما میزنیم all یعنی همه state ها  */
@@ -44,17 +56,17 @@ class MyApp extends StatelessWidget {
             fontFamily: FontFamily.avenir,
           )))),
           textTheme: const TextTheme(
-            subtitle1: TextStyle(
-              fontFamily: FontFamily.avenir,
-              color: secondaryTextColor,
-              fontSize: 14,
-            ),
             headline6: TextStyle(
               fontFamily: FontFamily.avenir,
               fontWeight: FontWeight.bold,
               color: primaryTextColor,
               fontSize: 18,
             ),
+            headline4: TextStyle(
+                fontFamily: FontFamily.avenir,
+                fontWeight: FontWeight.w700,
+                fontSize: 24,
+                color: primaryTextColor),
             headline5: TextStyle(
                 fontFamily: FontFamily.avenir,
                 fontSize: 20,
@@ -64,6 +76,11 @@ class MyApp extends StatelessWidget {
               fontFamily: FontFamily.avenir,
               color: secondaryTextColor,
               fontSize: 12,
+            ),
+            subtitle1: TextStyle(
+              fontFamily: FontFamily.avenir,
+              color: secondaryTextColor,
+              fontSize: 14,
             ),
             subtitle2: TextStyle(
                 fontFamily: FontFamily.avenir,
