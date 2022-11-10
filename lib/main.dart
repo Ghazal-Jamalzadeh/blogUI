@@ -68,6 +68,11 @@ class MyApp extends StatelessWidget {
             titleSpacing: 32 ,
           ),
 
+          /* تم اسنک بار */
+          // snackBarTheme: const SnackBarThemeData(
+          //   backgroundColor: primaryColor ,
+          // ),
+
           textTheme: const TextTheme(
             headline6: TextStyle(
               fontFamily: FontFamily.avenir,

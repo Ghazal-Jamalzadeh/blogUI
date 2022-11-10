@@ -70,6 +70,9 @@ class ArticleScreen extends StatelessWidget {
           CustomScrollView(
             slivers: [
               SliverAppBar(
+                /* برای ثابت ماندن اپ بار */
+                // pinned: true ,
+                // floating: true ,
                 title: const Text('Article'),
                 actions: [
                   IconButton(
@@ -161,6 +164,7 @@ class ArticleScreen extends StatelessWidget {
               ),
             ],
           ),
+          /*GRADIANT */
           Positioned(
             bottom: 0,
             child: Container(
@@ -186,6 +190,7 @@ class ArticleScreen extends StatelessWidget {
   void showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(message),
+      /* نوع نمایش اسنک بار */
       behavior: SnackBarBehavior.fixed,
     ));
   }
