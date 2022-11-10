@@ -298,7 +298,7 @@ class _PostList extends StatelessWidget {
             physics: ClampingScrollPhysics(),
             itemBuilder: (context, index) {
               final post = posts[index];
-              return _Post(post: post);
+              return Post(post: post);
             }),
         SizedBox(
           height: 32,
@@ -308,8 +308,8 @@ class _PostList extends StatelessWidget {
   }
 }
 
-class _Post extends StatelessWidget {
-  const _Post({
+class Post extends StatelessWidget {
+  const Post({
     Key? key,
     required this.post,
   }) : super(key: key);

@@ -1,9 +1,6 @@
 import 'package:blogui/article.dart';
-import 'package:blogui/carousel/carousel_slider.dart';
-import 'package:blogui/data.dart';
-import 'package:blogui/gen/assets.gen.dart';
 import 'package:blogui/gen/fonts.gen.dart';
-import 'package:blogui/splash.dart';
+import 'package:blogui/profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -119,7 +116,7 @@ class MyApp extends StatelessWidget {
       //     Positioned(bottom: 0, right: 0, left: 0, child: _BottomNavigation())
       //   ],
       // ),
-      home: const ArticleScreen(),
+      home: const ProfileScreen(),
     );
   }
 }
