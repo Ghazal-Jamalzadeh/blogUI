@@ -1,5 +1,6 @@
 import 'package:blogui/article.dart';
 import 'package:blogui/gen/fonts.gen.dart';
+import 'package:blogui/home.dart';
 import 'package:blogui/profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +45,6 @@ class MyApp extends StatelessWidget {
               background: Color(0xffFBFCFF),
               surface: Colors.white,
               onBackground: primaryTextColor),
-
           textButtonTheme: TextButtonThemeData(
               style: ButtonStyle(
                   /* چون دکمه است MaterialStateProperty میگیره که state های مختلفی را ساپورت میکنه. ولی ما میزنیم all یعنی همه state ها  */
@@ -57,12 +57,12 @@ class MyApp extends StatelessWidget {
           /*تعریف استایل اپ بار */
           appBarTheme: const AppBarTheme(
             /*رنگ بک گراند */
-            backgroundColor: Colors.white ,
+            backgroundColor: Colors.white,
             /* رنگ تکست ها و آیتم های رویی */
-            foregroundColor: primaryTextColor ,
-            elevation: 0 ,
+            foregroundColor: primaryTextColor,
+            elevation: 0,
             /* فاصله title ای که در اپ بار قرار میگرد از دو طرف */
-            titleSpacing: 32 ,
+            titleSpacing: 32,
           ),
 
           /* تم اسنک بار */
@@ -116,13 +116,70 @@ class MyApp extends StatelessWidget {
       //     Positioned(bottom: 0, right: 0, left: 0, child: _BottomNavigation())
       //   ],
       // ),
-      home: const ProfileScreen(),
+      home: const MainScreen(),
     );
   }
 }
 
+class MainScreen extends StatefulWidget {
+  const MainScreen({Key? key}) : super(key: key);
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+const int homeIndex = 0;
+
+const int articleIndex = 1;
+
+const int searchIndex = 2;
+
+const int menuIndex = 3;
+
+class _MainScreenState extends State<MainScreen> {
+  int selectedScreenIndex = homeIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      bottomNavigationBar: _BottomNavigation(onTap: (int index){
+        setState(() {
+          selectedScreenIndex =  index ;
+        });
+      },),
+      /*میهش بادی را به این شکل داد بهش ولی اون وقت همیشه یک صفحه میشه */
+      // body: HomeScreen(),
+      body: IndexedStack(
+        /* این ایندکس به صورت پیش فرض انتخاب میشه  */
+        index: selectedScreenIndex,
+        children: [
+          HomeScreen(),
+          ArticleScreen(),
+          SearchScreen(),
+          ProfileScreen()
+        ],
+      ),
+    );
+  }
+}
+
+class SearchScreen extends StatelessWidget {
+  const SearchScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+        child: Text(
+      'Search Screen',
+      style: Theme.of(context).textTheme.headline4,
+    ));
+  }
+}
+
 class _BottomNavigation extends StatelessWidget {
-  const _BottomNavigation({Key? key}) : super(key: key);
+  final Function(int index) onTap;
+
+  const _BottomNavigation({Key? key, required this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -135,38 +192,50 @@ class _BottomNavigation extends StatelessWidget {
             right: 0,
             bottom: 0,
             child: Container(
-                height: 65,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                    boxShadow: [BoxShadow(blurRadius: 20 , color: const Color(0xaa9B8487).withOpacity(0.3))]
-                ),
-            child: Row(
+              height: 65,
+              decoration: BoxDecoration(color: Colors.white, boxShadow: [
+                BoxShadow(
+                    blurRadius: 20,
+                    color: const Color(0xaa9B8487).withOpacity(0.3))
+              ]),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: const [
+                children: [
                   BottomNavigationItem(
-                      iconFileName: 'Home.png',
-                      activeIconFileName: 'Home.png',
-                      title: 'Home'),
+                    iconFileName: 'Home.png',
+                    activeIconFileName: 'Home.png',
+                    title: 'Home',
+                    onTap: () {
+                      onTap(homeIndex);
+                    },
+                  ),
                   BottomNavigationItem(
-                      iconFileName: 'Articles.png',
-                      activeIconFileName: 'Articles.png',
-                      title: 'Article'),
+                    iconFileName: 'Articles.png',
+                    activeIconFileName: 'Articles.png',
+                    title: 'Article',
+                    onTap: () {
+                      onTap(articleIndex);
+                    },
+                  ),
                   SizedBox(
                     width: 8,
                   ),
                   BottomNavigationItem(
-                      iconFileName: 'Search.png',
-                      activeIconFileName: 'Search.png',
-                      title: 'Search'),
+                    iconFileName: 'Search.png',
+                    activeIconFileName: 'Search.png',
+                    title: 'Search',
+                    onTap: () {onTap(searchIndex) ; },
+                  ),
                   BottomNavigationItem(
-                      iconFileName: 'Menu.png',
-                      activeIconFileName: 'Menu.png',
-                      title: 'Menu'),
+                    iconFileName: 'Menu.png',
+                    activeIconFileName: 'Menu.png',
+                    title: 'Menu',
+                    onTap: () {onTap(menuIndex);},
+                  ),
                 ],
-
+              ),
             ),
-            ),
-          ) ,
+          ),
           /* دقیقا از بالا و پایین و چپ و راست وسط پرنتش قرار میگیره */
           Center(
             child: Container(
@@ -174,12 +243,12 @@ class _BottomNavigation extends StatelessWidget {
               height: 85,
               alignment: Alignment.topCenter,
               child: Container(
-                height: 65,
+                  height: 65,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(32.5) ,
+                    borderRadius: BorderRadius.circular(32.5),
                     color: Color(0xff376AED),
-                      border: Border.all(color: Colors.white, width: 4),
-              ) ,
+                    border: Border.all(color: Colors.white, width: 4),
+                  ),
                   child: Image.asset('assets/img/icons/plus.png')),
             ),
           )
@@ -193,28 +262,33 @@ class BottomNavigationItem extends StatelessWidget {
   final String iconFileName;
   final String activeIconFileName;
   final String title;
+  final Function() onTap;
 
-  const BottomNavigationItem(
-      {Key? key,
-      required this.iconFileName,
-      required this.activeIconFileName,
-      required this.title})
-      : super(key: key);
+  const BottomNavigationItem({
+    Key? key,
+    required this.iconFileName,
+    required this.activeIconFileName,
+    required this.title,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Image.asset('assets/img/icons/$iconFileName'),
-        const SizedBox(
-          height: 4,
-        ),
-        Text(
-          title,
-          style: Theme.of(context).textTheme.caption,
-        )
-      ],
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset('assets/img/icons/$iconFileName' , color: Colors.indigo,),
+          const SizedBox(
+            height: 4,
+          ),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.caption,
+          )
+        ],
+      ),
     );
   }
 }
