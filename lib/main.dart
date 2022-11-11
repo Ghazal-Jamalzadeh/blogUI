@@ -47,12 +47,12 @@ class MyApp extends StatelessWidget {
               onBackground: primaryTextColor),
           textButtonTheme: TextButtonThemeData(
               style: ButtonStyle(
-                  /* چون دکمه است MaterialStateProperty میگیره که state های مختلفی را ساپورت میکنه. ولی ما میزنیم all یعنی همه state ها  */
+                /* چون دکمه است MaterialStateProperty میگیره که state های مختلفی را ساپورت میکنه. ولی ما میزنیم all یعنی همه state ها  */
                   textStyle: MaterialStateProperty.all(const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            fontFamily: FontFamily.avenir,
-          )))),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: FontFamily.avenir,
+                  )))),
 
           /*تعریف استایل اپ بار */
           appBarTheme: const AppBarTheme(
@@ -136,7 +136,7 @@ const int searchIndex = 2;
 
 const int menuIndex = 3;
 
-const double bottomNavHeight =  65 ; 
+const double bottomNavHeight =  65 ;
 
 class _MainScreenState extends State<MainScreen> {
   int selectedScreenIndex = homeIndex;
@@ -210,14 +210,14 @@ class _MainScreenState extends State<MainScreen> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-       /* میهش بادی را به این شکل داد بهش ولی اون وقت همیشه یک صفحه میشه */
+        /* میهش بادی را به این شکل داد بهش ولی اون وقت همیشه یک صفحه میشه */
         // body: HomeScreen(),
         body: Stack(
           children: [
             Positioned.fill(
               bottom: bottomNavHeight,
               child: IndexedStack(
-              /*   این ایندکس به صورت پیش فرض انتخاب میشه  */
+                /*   این ایندکس به صورت پیش فرض انتخاب میشه  */
                 index: selectedScreenIndex,
                 children: [
                   // HomeScreen(),
@@ -225,10 +225,12 @@ class _MainScreenState extends State<MainScreen> {
                   // SearchScreen(),
                   // ProfileScreen()
 
-                  Navigator( key : _homeKey , onGenerateRoute: (settings)=> MaterialPageRoute(builder: (context)=>HomeScreen()) ,) ,
-                  Navigator(key: _articleKey ,  onGenerateRoute: (settings)=> MaterialPageRoute(builder: (context)=>ArticleScreen()) ,),
-                  Navigator(key: _searchKey , onGenerateRoute: (settings)=> MaterialPageRoute(builder: (context)=>SimpleScreen()) ,) ,
-                  Navigator(key: _menuKey ,  onGenerateRoute: (settings)=> MaterialPageRoute(builder: (context)=>ProfileScreen()) ,) ,
+                  // Navigator( key : _homeKey , onGenerateRoute: (settings)=> MaterialPageRoute(builder: (context)=>HomeScreen()) ,) ,
+                  // Navigator( key : _homeKey , onGenerateRoute: (settings)=> MaterialPageRoute(builder: (context)=> Offstage(offstage: selectedScreenIndex != homeIndex , child: HomeScreen())) ,) ,
+                  _navigator(_homeKey, homeIndex, const HomeScreen()),
+                  _navigator(_articleKey, articleIndex, const ArticleScreen()),
+                  _navigator(_searchKey, searchIndex, const SimpleScreen(tabName: 'Search',)),
+                  _navigator(_menuKey, menuIndex, const ProfileScreen()),
 
                 ],
               ),
@@ -251,6 +253,21 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  Widget _navigator(GlobalKey key, int index, Widget child) {
+    /* یعنی تا حالا این تب انتخاب نشده باشه چوا اگه امنتخاب شده بود state آن null نمیبود */
+    /* و داخل ایندکس این تب نبودیم */
+    return key.currentState == null && selectedScreenIndex != index
+    /* بیا یک container خالی برگردون */
+        ? Container()
+    /* در غیر این صورت navigator و این ها رو بساز و return کن */
+        : Navigator(
+        key: key,
+        onGenerateRoute: (settings) => MaterialPageRoute(
+            builder: (context) => Offstage(
+                offstage: selectedScreenIndex != index, child: child)));
+  }
+
+
 }
 
 // class SearchScreen extends StatelessWidget {
@@ -266,7 +283,7 @@ class _MainScreenState extends State<MainScreen> {
 //   }
 // }
 
-int screenNumber = 1;
+/*int screenNumber = 1;
 
 class SimpleScreen extends StatelessWidget {
   @override
@@ -285,6 +302,38 @@ class SimpleScreen extends StatelessWidget {
 
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => SimpleScreen()));
+              },
+              child: Text('Click Me')),
+        ],
+      ),
+    );
+  }
+}*/
+
+class SimpleScreen extends StatelessWidget {
+  /* یعنی اگر screeNumber پاس داده نشد مقدارش را برابر با یک قرار بده */
+  const SimpleScreen({Key? key, required this.tabName, this.screenNumber = 1})
+      : super(key: key);
+  final String tabName;
+  final int screenNumber;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Tab: $tabName, Screen #$screenNumber',
+            style: Theme.of(context).textTheme.headline4,
+          ),
+          ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => SimpleScreen(
+                      tabName: tabName,
+                      screenNumber: screenNumber+1,
+                    )));
               },
               child: Text('Click Me')),
         ],
@@ -332,7 +381,7 @@ class _BottomNavigation extends StatelessWidget {
                     iconFileName: 'Articles.png',
                     activeIconFileName: 'Articles.png',
                     title: 'Article',
-                      isActive: selectedIndex==articleIndex,
+                    isActive: selectedIndex==articleIndex,
                     onTap: () {
                       onTap(articleIndex);
                     },
@@ -416,9 +465,9 @@ class BottomNavigationItem extends StatelessWidget {
               height: 4,
             ),
             Text(
-              title,
-              style: themeData.textTheme.caption!
-                  .apply(color: isActive? themeData.colorScheme.primary : themeData.textTheme.caption!.color)
+                title,
+                style: themeData.textTheme.caption!
+                    .apply(color: isActive? themeData.colorScheme.primary : themeData.textTheme.caption!.color)
             )
           ],
         ),
