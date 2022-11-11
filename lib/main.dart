@@ -141,6 +141,43 @@ const double bottomNavHeight =  65 ;
 class _MainScreenState extends State<MainScreen> {
   int selectedScreenIndex = homeIndex;
 
+  final List<int> _history = [];
+
+  GlobalKey<NavigatorState> _homeKey = GlobalKey();
+  GlobalKey<NavigatorState> _articleKey = GlobalKey();
+  GlobalKey<NavigatorState> _searchKey = GlobalKey();
+  GlobalKey<NavigatorState> _menuKey = GlobalKey();
+
+  late final map = {
+    homeIndex: _homeKey,
+    articleIndex: _articleKey,
+    searchIndex: _searchKey,
+    menuIndex: _menuKey,
+  };
+
+  Future<bool> _onWillPop() async {
+
+    // if (_homeKey.currentState!.canPop()){
+    //   _homeKey.currentState!.pop() ;
+    // }
+
+    final NavigatorState currentSelectedTabNavigatorState =
+    map[selectedScreenIndex]!.currentState!;
+    if (currentSelectedTabNavigatorState.canPop()) {
+      currentSelectedTabNavigatorState.pop();
+      return false;
+    }
+    else if (_history.isNotEmpty) {
+      setState(() {
+        selectedScreenIndex = _history.last;
+        _history.removeLast();
+      });
+      return false;
+    }
+
+    return true;
+  }
+
   /* روش زیر برای bottom nav های ساده خیلی خوب کار میکنه*/
   /* ولی برای مورد ما صفحه باید بره پشت bottom nav پس به روش دوم مینویسیم */
 /*  @override
@@ -170,51 +207,89 @@ class _MainScreenState extends State<MainScreen> {
   /* بادی را میبریم داخل یک استک */
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-     /* میهش بادی را به این شکل داد بهش ولی اون وقت همیشه یک صفحه میشه */
-      // body: HomeScreen(),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            bottom: bottomNavHeight,
-            child: IndexedStack(
-            /*   این ایندکس به صورت پیش فرض انتخاب میشه  */
-              index: selectedScreenIndex,
-              children: [
-                HomeScreen(),
-                ArticleScreen(),
-                SearchScreen(),
-                ProfileScreen()
-              ],
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+       /* میهش بادی را به این شکل داد بهش ولی اون وقت همیشه یک صفحه میشه */
+        // body: HomeScreen(),
+        body: Stack(
+          children: [
+            Positioned.fill(
+              bottom: bottomNavHeight,
+              child: IndexedStack(
+              /*   این ایندکس به صورت پیش فرض انتخاب میشه  */
+                index: selectedScreenIndex,
+                children: [
+                  // HomeScreen(),
+                  // ArticleScreen(),
+                  // SearchScreen(),
+                  // ProfileScreen()
+
+                  Navigator( key : _homeKey , onGenerateRoute: (settings)=> MaterialPageRoute(builder: (context)=>HomeScreen()) ,) ,
+                  Navigator(key: _articleKey ,  onGenerateRoute: (settings)=> MaterialPageRoute(builder: (context)=>ArticleScreen()) ,),
+                  Navigator(key: _searchKey , onGenerateRoute: (settings)=> MaterialPageRoute(builder: (context)=>SimpleScreen()) ,) ,
+                  Navigator(key: _menuKey ,  onGenerateRoute: (settings)=> MaterialPageRoute(builder: (context)=>ProfileScreen()) ,) ,
+
+                ],
+              ),
             ),
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0 ,
-            left: 0  ,
-            child: _BottomNavigation(onTap: (int index){
-              setState(() {
-                selectedScreenIndex =  index ;
-              });
-            }, selectedIndex: selectedScreenIndex,),
-          ),
-        ],
+            Positioned(
+              bottom: 0,
+              right: 0 ,
+              left: 0  ,
+              child: _BottomNavigation(onTap: (int index){
+                setState(() {
+                  _history.remove(selectedScreenIndex) ;
+                  _history.add(selectedScreenIndex) ;
+                  selectedScreenIndex =  index ;
+                });
+              }, selectedIndex: selectedScreenIndex,),
+            ),
+          ],
+        ),
       ),
     );
   }
 
 }
 
-class SearchScreen extends StatelessWidget {
-  const SearchScreen({Key? key}) : super(key: key);
+// class SearchScreen extends StatelessWidget {
+//   const SearchScreen({Key? key}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Center(
+//         child: Text(
+//       'Search Screen',
+//       style: Theme.of(context).textTheme.headline4,
+//     ));
+//   }
+// }
 
+int screenNumber = 1;
+
+class SimpleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-        child: Text(
-      'Search Screen',
-      style: Theme.of(context).textTheme.headline4,
-    ));
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Screen #$screenNumber',
+            style: Theme.of(context).textTheme.headline4,
+          ),
+          ElevatedButton(
+              onPressed: () {
+                screenNumber++;
+
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => SimpleScreen()));
+              },
+              child: Text('Click Me')),
+        ],
+      ),
+    );
   }
 }
 
