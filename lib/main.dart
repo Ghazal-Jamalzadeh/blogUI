@@ -136,21 +136,25 @@ const int searchIndex = 2;
 
 const int menuIndex = 3;
 
+const double bottomNavHeight =  65 ; 
+
 class _MainScreenState extends State<MainScreen> {
   int selectedScreenIndex = homeIndex;
 
-  @override
+  /* روش زیر برای bottom nav های ساده خیلی خوب کار میکنه*/
+  /* ولی برای مورد ما صفحه باید بره پشت bottom nav پس به روش دوم مینویسیم */
+/*  @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: _BottomNavigation(onTap: (int index){
         setState(() {
           selectedScreenIndex =  index ;
         });
-      },),
-      /*میهش بادی را به این شکل داد بهش ولی اون وقت همیشه یک صفحه میشه */
+      }, selectedIndex: selectedScreenIndex,),
+      *//*میهش بادی را به این شکل داد بهش ولی اون وقت همیشه یک صفحه میشه *//*
       // body: HomeScreen(),
       body: IndexedStack(
-        /* این ایندکس به صورت پیش فرض انتخاب میشه  */
+        *//* این ایندکس به صورت پیش فرض انتخاب میشه  *//*
         index: selectedScreenIndex,
         children: [
           HomeScreen(),
@@ -160,7 +164,45 @@ class _MainScreenState extends State<MainScreen> {
         ],
       ),
     );
+  }*/
+
+/* روش دوم مدیریت bottom nav */
+  /* بادی را میبریم داخل یک استک */
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+     /* میهش بادی را به این شکل داد بهش ولی اون وقت همیشه یک صفحه میشه */
+      // body: HomeScreen(),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            bottom: bottomNavHeight,
+            child: IndexedStack(
+            /*   این ایندکس به صورت پیش فرض انتخاب میشه  */
+              index: selectedScreenIndex,
+              children: [
+                HomeScreen(),
+                ArticleScreen(),
+                SearchScreen(),
+                ProfileScreen()
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0 ,
+            left: 0  ,
+            child: _BottomNavigation(onTap: (int index){
+              setState(() {
+                selectedScreenIndex =  index ;
+              });
+            }, selectedIndex: selectedScreenIndex,),
+          ),
+        ],
+      ),
+    );
   }
+
 }
 
 class SearchScreen extends StatelessWidget {
@@ -178,8 +220,9 @@ class SearchScreen extends StatelessWidget {
 
 class _BottomNavigation extends StatelessWidget {
   final Function(int index) onTap;
+  final int selectedIndex ;
 
-  const _BottomNavigation({Key? key, required this.onTap}) : super(key: key);
+  const _BottomNavigation({Key? key, required this.onTap , required this.selectedIndex}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -192,7 +235,7 @@ class _BottomNavigation extends StatelessWidget {
             right: 0,
             bottom: 0,
             child: Container(
-              height: 65,
+              height: bottomNavHeight,
               decoration: BoxDecoration(color: Colors.white, boxShadow: [
                 BoxShadow(
                     blurRadius: 20,
@@ -205,6 +248,7 @@ class _BottomNavigation extends StatelessWidget {
                     iconFileName: 'Home.png',
                     activeIconFileName: 'Home.png',
                     title: 'Home',
+                    isActive: selectedIndex==homeIndex,
                     onTap: () {
                       onTap(homeIndex);
                     },
@@ -213,23 +257,27 @@ class _BottomNavigation extends StatelessWidget {
                     iconFileName: 'Articles.png',
                     activeIconFileName: 'Articles.png',
                     title: 'Article',
+                      isActive: selectedIndex==articleIndex,
                     onTap: () {
                       onTap(articleIndex);
                     },
                   ),
-                  SizedBox(
-                    width: 8,
-                  ),
+                  // SizedBox(width: 8,),
+                  /* در حالت بالا فقط ۸ تا فضا وسط میذاریم که کمه*/
+                  /* در حالت پایین فضا به طور مساوی بین ۵ آیتم تقسیم میشه */
+                  Expanded(child: Container())  ,
                   BottomNavigationItem(
                     iconFileName: 'Search.png',
                     activeIconFileName: 'Search.png',
                     title: 'Search',
+                    isActive: selectedIndex==searchIndex,
                     onTap: () {onTap(searchIndex) ; },
                   ),
                   BottomNavigationItem(
                     iconFileName: 'Menu.png',
                     activeIconFileName: 'Menu.png',
                     title: 'Menu',
+                    isActive: selectedIndex==menuIndex,
                     onTap: () {onTap(menuIndex);},
                   ),
                 ],
@@ -262,6 +310,7 @@ class BottomNavigationItem extends StatelessWidget {
   final String iconFileName;
   final String activeIconFileName;
   final String title;
+  final bool isActive ;
   final Function() onTap;
 
   const BottomNavigationItem({
@@ -269,25 +318,35 @@ class BottomNavigationItem extends StatelessWidget {
     required this.iconFileName,
     required this.activeIconFileName,
     required this.title,
+    required this.isActive ,
     required this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset('assets/img/icons/$iconFileName' , color: Colors.indigo,),
-          const SizedBox(
-            height: 4,
-          ),
-          Text(
-            title,
-            style: Theme.of(context).textTheme.caption,
-          )
-        ],
+
+    final ThemeData themeData = Theme.of(context) ;
+
+    return Expanded(
+      flex: 1 ,
+      child: InkWell(
+        onTap: onTap,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/img/icons/$iconFileName'
+              , color: isActive? themeData.colorScheme.primary : themeData.textTheme.caption!.color , ),
+            const SizedBox(
+              height: 4,
+            ),
+            Text(
+              title,
+              style: themeData.textTheme.caption!
+                  .apply(color: isActive? themeData.colorScheme.primary : themeData.textTheme.caption!.color)
+            )
+          ],
+        ),
       ),
     );
   }
