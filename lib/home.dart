@@ -295,6 +295,7 @@ class _PostList extends StatelessWidget {
             itemExtent: 141,
             /* برای لیست های طولانی و تو درتو این را true نکنید چون پرفورمنس بد میشه */
             /* توی فلاتر width height برای تکست ویو باید کاملا مشخص باشه */
+            /* یعنی به تعداد فرزندان لیستم بیا ارتفاع لیست رو مشخص کن. تعداد آیتم را ضربدر تعداد کن در اصل. برای همین برای لیست های طولانی مناسب نیست*/
             shrinkWrap: true,
             physics: ClampingScrollPhysics(),
             itemBuilder: (context, index) {
